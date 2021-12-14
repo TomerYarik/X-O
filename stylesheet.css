@@ -1,0 +1,36 @@
+body {
+    text-align: center;
+    background-color: aquamarine;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 150px 150px 150px;
+    grid-template-rows: 150px 150px 150px;
+    margin: auto;
+    margin-top: 200px;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+}
+
+.cell:hover {
+    background-color: aliceblue;
+}
+
+.selected0 {
+    background-color: brown;
+}
+.selected1 {
+    background-color: burlywood;
+}
+.selected {
+    font-size: larger;
+}
