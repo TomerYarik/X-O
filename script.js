@@ -56,7 +56,7 @@ function declareWinner(arrX ,arrO) {
     //checks if someone won
     if(checkWin(arrO) || checkWin(arrX)) {
         for(const cell of cells) cell.classList.add('selected');
-        if(resetBtn.style.display = ' hidden') player === 0 ? player++ : player--;
+        checkWin(arrX) ? player = 0 : player = 1 ;
         resetBtn.style.display = 'inline';
         winner.textContent = `player ${player + 1} won!`;
     }
