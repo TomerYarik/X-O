@@ -3,12 +3,22 @@ body {
     background-color: aquamarine;
 }
 
+button {
+    display: none;
+    /* margin-top: 150px; */
+    width: 200px;
+    height: 100px;
+    font-size: large;
+    border-radius: 10px;
+    background-color:blanchedalmond;
+}
+
 .container {
     display: grid;
     grid-template-columns: 150px 150px 150px;
     grid-template-rows: 150px 150px 150px;
     margin: auto;
-    margin-top: 200px;
+    margin-top: 50px;
     align-items: center;
     justify-content: center;
 }
