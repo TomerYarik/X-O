@@ -4,7 +4,6 @@ body {
 }
 
 button {
-    display: none;
     /* margin-top: 150px; */
     width: 200px;
     height: 100px;
@@ -13,6 +12,20 @@ button {
     background-color:blanchedalmond;
 }
 
+.game {
+    display: none;
+}
+
+.selectPlayer {
+    display: none;
+}
+
+/* reset button*/
+.resetBtn {
+    display: none;
+}
+
+/* container for the cells*/
 .container {
     display: grid;
     grid-template-columns: 150px 150px 150px;
@@ -23,6 +36,7 @@ button {
     justify-content: center;
 }
 
+/* cell design*/
 .cell {
     display: flex;
     height: 100%;
@@ -35,12 +49,16 @@ button {
     background-color: aliceblue;
 }
 
+
+/* selcted class X */ 
 .selected0 {
     background-color: brown;
 }
+/* selected class O */
 .selected1 {
     background-color: burlywood;
 }
+/* selected class for the engine*/
 .selected {
     font-size: larger;
 }
