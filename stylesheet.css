@@ -20,6 +20,10 @@ button {
     display: none;
 }
 
+.selectPlayerStarter {
+    display: none;
+}
+
 /* reset button*/
 .resetBtn {
     display: none;
