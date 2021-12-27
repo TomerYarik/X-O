@@ -3,8 +3,6 @@
 //selectors
 let player; //decides which player is current
 let cells = document.getElementsByClassName('cell'); //array of cells
-const memoryX = {}; // object to mark the positions of each X
-const memoryO = {}; //object to mark the positions of each O
 const resetBtn = document.querySelector('.resetBtn');
 const winner = document.querySelector('.winner');
 const btnEasy = document.querySelector('.easy');
@@ -21,19 +19,80 @@ const selectPlayerOrPcContainer = document.querySelector('.selectPlayer');
 
 //functions
 
-//checks if the current array contains ine of the eight winning combos
-const checkWin = function(array) {
-    if(array.includes('0') && array.includes('1') && array.includes('2')) return true;
-    else if(array.includes('0') && array.includes('3') && array.includes('6')) return true;
-    else if(array.includes('0') && array.includes('4') && array.includes('8')) return true;
-    else if(array.includes('1') && array.includes('4') && array.includes('7'))  return true;
-    else if(array.includes('2') && array.includes('5') && array.includes('8')) return true;
-    else if(array.includes('2') && array.includes('4') && array.includes('6')) return true;
-    else if(array.includes('3') && array.includes('4') && array.includes('5')) return true;
-    else if(array.includes('6') && array.includes('7') && array.includes('8')) return true;
-    else {
-        return false;
+function makeNestedArray(arrayOfCells) {
+    let array = [];
+    for(let i =0; i<arrayOfCells.length; i+= Math.sqrt(arrayOfCells.length)) {
+        let smallArr = []
+        for(let j=i; j<i+Math.sqrt(arrayOfCells.length);j++){
+            smallArr.push(arrayOfCells[j].textContent);
+        }
+        array.push(smallArr);
     }
+    return array;
+}
+
+const checkAllEqual = array => array.every(letter => letter === array[0]);
+
+function winnerLetter(checkArr) {
+    if(!checkArr.includes('')) {
+        const equalLine = checkAllEqual(checkArr);
+        if(equalLine) return checkArr[0];
+    }
+}
+
+function checkHorizontal(array) {
+    for(let i=0;i<array.length;i++) {
+        const checkArr = array[i];
+        if(!checkArr.includes('')) {
+            const equalLine = checkAllEqual(checkArr);
+            if(equalLine) return checkArr[0];
+        }
+    }
+    return null;
+}
+
+function checkVertical(array) {
+    for(let i=0;i<array.length;i++) {
+        const checkArr = [];
+        for(let j=0;j<array.length;j++) {
+            checkArr.push(array[j][i]);
+        }
+        if(!checkArr.includes('')) {
+            const equalLine = checkAllEqual(checkArr);
+            if(equalLine) return checkArr[0];
+        }
+    }
+    return null;
+}
+
+function checkLineLTR(array) {
+    const checkArr = [];
+    for(let i=0;i<array.length;i++) {
+        checkArr.push(array[i][i]);
+    }
+    return winnerLetter(checkArr) || null;
+}
+
+function checkLineRTL(array) {
+    const checkArr = [];
+    let lastIndex = array.length-1;
+    for(let i=0;i<array.length;i++){
+        checkArr.push(array[i][lastIndex]);
+        lastIndex--;
+    }
+    return winnerLetter(checkArr) || null;
+}
+
+//checks if someone won
+const checkWin = function(arrayOfCells) {
+    const array = makeNestedArray(arrayOfCells);
+    const winner = checkHorizontal(array) || checkVertical(array) || checkLineLTR(array) || checkLineRTL(array) || null;
+    if(winner !== null) declareWinner(winner);
+}
+
+
+const checkDraw = function() {
+
 }
 
 //resets the game
@@ -42,59 +101,40 @@ function resetAll() {
         cell.classList.remove('selected');
         cell.classList.remove('selected1') || cell.classList.remove('selected0');
         cell.textContent = '';
-        player =0;
-        for(const key of Object.keys(memoryO)) delete memoryO[key];
-        for(const key of Object.keys(memoryX)) delete memoryX[key];
+        player = null;
         winner.textContent = '';
     }
     resetBtn.style.display = 'none';
     updateToStart();
-}
-function clearMemory() {
-    for(const key in memoryX) delete memoryX[key];
-    for(const key in memoryO) delete memoryO[key];
 }
 
 function addSelectedClass(currentCell) {
     currentCell.classList.add('selected');
     currentCell.classList.add(`selected${player}`);
     currentCell.textContent = player === 0 ? 'X' : 'O';
-
+}
+function switchPlayer() {
+    if(resetBtn.style.display = 'hidden') player === 0 ? player++ : player--;
 }
 //selects the current cell and switches to the next player
 function switchingPlayer(currentCell) {
     if(!currentCell.classList.contains(`selected`)) {
         addSelectedClass(currentCell);
-        if(resetBtn.style.display = 'hidden') player === 0 ? player++ : player--;
+        switchPlayer();
     }
 }
 
 //pushes the memory object keys to arrays
 function pushToArr(currentCell, i) {
-    currentCell.textContent === 'X' ? memoryX[i] = currentCell.textContent : memoryO[i] = currentCell.textContent;
+    currentCell.textContent === 'X' ? arrX.push(i) : arrO.push(i);
 }
 
-//checks if someone won, and if so, declares who won, else ddeclares draw
-function declareWinner(arrX ,arrO) {
+//decalers the winner
+function declareWinner(winnerLetter) {
     //checks if someone won
-    if(checkWin(arrO)) {
-        for(const cell of cells) cell.classList.add('selected');
-        winner.textContent = `Os Have Won!`;
-        resetBtn.style.display = "inline";
-        clearMemory();
-    }
-    else if(checkWin(arrX)) {
-        for(const cell of cells) cell.classList.add('selected');
-        winner.textContent = "Xs Have Won!"
-        resetBtn.style.display = "inline";
-        clearMemory();
-    }
-    //checks if no one won
-    else if(arrX.length + arrO.length === 9) {
-        resetBtn.style.display = 'inline';
-        winner.textContent = 'Draw!';
-        clearMemory();
-    }
+    for(const cell of cells) cell.classList.add('selected');
+    winner.textContent = `${winnerLetter}s HAVE WON!`;
+    resetBtn.style.display = "inline";
 }
 function updateGameDisplay() {
     selectorContainer.style.display = "none";
@@ -128,11 +168,13 @@ function set1V1() {
     for(let i=0;i<cells.length;i++) {
         const currentCell = cells[i];
         const gameEvents = function (){
-        switchingPlayer(currentCell);
-        pushToArr(currentCell, i);
-        const arrX = Object.keys(memoryX);
-        const arrO = Object.keys(memoryO); 
-        declareWinner(arrX, arrO);
+            switchingPlayer(currentCell);
+            checkWin(cells);
+            if(checkDraw(cells)) {
+                console.log('entered draw');
+                resetBtn.style.display = 'inline';
+                winner.textContent = 'DRAW!';
+            }
         }
         currentCell.addEventListener('click', gameEvents);
     }
@@ -163,10 +205,10 @@ function setEasy() {
         const currentCell = cells[i];
         function gameEvents() {
             switchingPlayer(currentCell);
+            pushToArr(currentCell, i);
             const randomCell = createRandomCell();
             switchingPlayer(randomCell);
             const randomIndex = getIndex(randomCell);
-            pushToArr(currentCell, i);
             pushToArr(randomCell,randomIndex);
             const arrX = Object.keys(memoryX);
             const arrO = Object.keys(memoryO);
