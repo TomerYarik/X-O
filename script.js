@@ -19,6 +19,7 @@ const selectPlayerOrPcContainer = document.querySelector('.selectPlayer');
 
 //functions
 
+//makes nested array from the order of X's and O's on the board
 function makeNestedArray(arrayOfCells) {
     let array = [];
     for(let i =0; i<arrayOfCells.length; i+= Math.sqrt(arrayOfCells.length)) {
@@ -28,11 +29,14 @@ function makeNestedArray(arrayOfCells) {
         }
         array.push(smallArr);
     }
+    console.log(array);
     return array;
 }
 
+//checks if all of the values in the array that is given are equal
 const checkAllEqual = array => array.every(letter => letter === array[0]);
 
+//returns the letter of the winner
 function winnerLetter(checkArr) {
     if(!checkArr.includes('')) {
         const equalLine = checkAllEqual(checkArr);
@@ -40,6 +44,7 @@ function winnerLetter(checkArr) {
     }
 }
 
+//checks winning for horizontal
 function checkHorizontal(array) {
     for(let i=0;i<array.length;i++) {
         const checkArr = array[i];
@@ -51,6 +56,7 @@ function checkHorizontal(array) {
     return null;
 }
 
+//checks winning for vertical
 function checkVertical(array) {
     for(let i=0;i<array.length;i++) {
         const checkArr = [];
@@ -65,6 +71,7 @@ function checkVertical(array) {
     return null;
 }
 
+//checks winning for X line from left to right
 function checkLineLTR(array) {
     const checkArr = [];
     for(let i=0;i<array.length;i++) {
@@ -73,6 +80,7 @@ function checkLineLTR(array) {
     return winnerLetter(checkArr) || null;
 }
 
+//checks winning for X line from rigth to left
 function checkLineRTL(array) {
     const checkArr = [];
     let lastIndex = array.length-1;
@@ -90,9 +98,11 @@ const checkWin = function(arrayOfCells) {
     if(winner !== null) declareWinner(winner);
 }
 
-
-const checkDraw = function() {
-
+//checks if its a draw
+const checkDraw = function(arrayOfCells) {
+    const array = makeNestedArray(arrayOfCells);
+    if(!array.flat().includes('') && winner.textContent === '') return true;
+    return false;
 }
 
 //resets the game
@@ -108,14 +118,18 @@ function resetAll() {
     updateToStart();
 }
 
+//adds selected class to the cell
 function addSelectedClass(currentCell) {
     currentCell.classList.add('selected');
     currentCell.classList.add(`selected${player}`);
     currentCell.textContent = player === 0 ? 'X' : 'O';
 }
+
+//switches the player
 function switchPlayer() {
     if(resetBtn.style.display = 'hidden') player === 0 ? player++ : player--;
 }
+
 //selects the current cell and switches to the next player
 function switchingPlayer(currentCell) {
     if(!currentCell.classList.contains(`selected`)) {
@@ -124,18 +138,14 @@ function switchingPlayer(currentCell) {
     }
 }
 
-//pushes the memory object keys to arrays
-function pushToArr(currentCell, i) {
-    currentCell.textContent === 'X' ? arrX.push(i) : arrO.push(i);
-}
-
 //decalers the winner
 function declareWinner(winnerLetter) {
-    //checks if someone won
     for(const cell of cells) cell.classList.add('selected');
     winner.textContent = `${winnerLetter}s HAVE WON!`;
     resetBtn.style.display = "inline";
 }
+
+//updates the gaame dispaly and starts the game
 function updateGameDisplay() {
     selectorContainer.style.display = "none";
     selectPlayerContainer.style.display = "none";
@@ -145,18 +155,30 @@ function updateToStart() {
     selectorContainer.style.display = "inline";
     gameContainer.style.display = "none";
 }
+
+//sets player to X
 function setPlayer0() {
     player = 0;
     updateGameDisplay();
 }
+
+//sets player to O
 function setPlayer1() {
     player = 1;
     updateGameDisplay();
 }
+
+//plaer starts vs PC
 function setPlayer() {
     player = 0;
     selectPlayerOrPcContainer.style.display = "none";
     updateGameDisplay();
+}
+
+//displays draw message
+function setDraw() {
+    resetBtn.style.display = 'inline';
+    winner.textContent = 'DRAW!';
 }
 
 //sets the game to a 1V1 game
@@ -169,32 +191,23 @@ function set1V1() {
         const currentCell = cells[i];
         const gameEvents = function (){
             switchingPlayer(currentCell);
-            checkWin(cells);
-            if(checkDraw(cells)) {
-                console.log('entered draw');
-                resetBtn.style.display = 'inline';
-                winner.textContent = 'DRAW!';
-            }
+            checkWin(cells); 
+            if(checkDraw(cells)) setDraw();
         }
         currentCell.addEventListener('click', gameEvents);
     }
 }
 
-const randomNum = () => Math.trunc(Math.random() * 9);
+const randomNum = () => Math.floor(Math.random() * 9);
 
-function createRandomCell() {
+function createRandomCell(array) {
     let random = randomNum();
-    let randomCell = cells[random];
-    if(randomCell.classList.contains('selected')){
-        random = randomNum();
-        randomCell = cells[random];
+    let randomCell = array[random];
+    while(randomCell.classList.contains('selected')){
+        const newRandom = randomNum();
+        randomCell = array[newRandom];
     }
     return randomCell;
-}
-function getIndex(randomCell) {
-    for(let i=0;i<cells.length;i++){
-        if(cells[i] === randomCell) return i;
-    }
 }
 
 function setEasy() {
@@ -205,14 +218,14 @@ function setEasy() {
         const currentCell = cells[i];
         function gameEvents() {
             switchingPlayer(currentCell);
-            pushToArr(currentCell, i);
-            const randomCell = createRandomCell();
+            checkWin(cells); 
+            if(checkDraw(cells)) setDraw();
+            if(!checkWin(cells) && checkDraw(cells) === false){
+            const randomCell = createRandomCell(cells);
             switchingPlayer(randomCell);
-            const randomIndex = getIndex(randomCell);
-            pushToArr(randomCell,randomIndex);
-            const arrX = Object.keys(memoryX);
-            const arrO = Object.keys(memoryO);
-            declareWinner(arrX,arrO);
+            checkWin(cells);
+            if(checkDraw(cells)) setDraw();
+            }
         }
         currentCell.addEventListener('click',gameEvents);
     }
@@ -220,7 +233,6 @@ function setEasy() {
 function setHard() {
 
 }
-
 
 //reset button
 resetBtn.addEventListener('click', resetAll);
