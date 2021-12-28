@@ -47,6 +47,7 @@ button {
     justify-content: center;
     align-items: center;
     border: 2px solid black;
+    font-size: large;
 }
 
 .cell:hover {
@@ -61,8 +62,4 @@ button {
 /* selected class O */
 .selected1 {
     background-color: burlywood;
-}
-/* selected class for the engine*/
-.selected {
-    font-size: larger;
 }

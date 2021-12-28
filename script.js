@@ -29,7 +29,6 @@ function makeNestedArray(arrayOfCells) {
         }
         array.push(smallArr);
     }
-    console.log(array);
     return array;
 }
 
@@ -94,6 +93,7 @@ function checkLineRTL(array) {
 //checks if someone won
 const checkWin = function(arrayOfCells) {
     const array = makeNestedArray(arrayOfCells);
+    console.log(array);
     const winner = checkHorizontal(array) || checkVertical(array) || checkLineLTR(array) || checkLineRTL(array) || null;
     if(winner !== null) declareWinner(winner);
 }
@@ -108,7 +108,6 @@ const checkDraw = function(arrayOfCells) {
 //resets the game
 function resetAll() {
     for(let cell of cells) {
-        cell.classList.remove('selected');
         cell.classList.remove('selected1') || cell.classList.remove('selected0');
         cell.textContent = '';
         player = null;
@@ -120,7 +119,6 @@ function resetAll() {
 
 //adds selected class to the cell
 function addSelectedClass(currentCell) {
-    currentCell.classList.add('selected');
     currentCell.classList.add(`selected${player}`);
     currentCell.textContent = player === 0 ? 'X' : 'O';
 }
@@ -132,7 +130,7 @@ function switchPlayer() {
 
 //selects the current cell and switches to the next player
 function switchingPlayer(currentCell) {
-    if(!currentCell.classList.contains(`selected`)) {
+    if(currentCell.textContent === '') {
         addSelectedClass(currentCell);
         switchPlayer();
     }
@@ -140,7 +138,6 @@ function switchingPlayer(currentCell) {
 
 //decalers the winner
 function declareWinner(winnerLetter) {
-    for(const cell of cells) cell.classList.add('selected');
     winner.textContent = `${winnerLetter}s HAVE WON!`;
     resetBtn.style.display = "inline";
 }
@@ -190,22 +187,25 @@ function set1V1() {
     for(let i=0;i<cells.length;i++) {
         const currentCell = cells[i];
         const gameEvents = function (){
+            if(winner.textContent === ''){
+            console.log('entered gameEvents');
             switchingPlayer(currentCell);
             checkWin(cells); 
             if(checkDraw(cells)) setDraw();
+            }
         }
         currentCell.addEventListener('click', gameEvents);
     }
 }
 
-const randomNum = () => Math.floor(Math.random() * 9);
+const randomNum = () => Math.floor(Math.random() * cells.length);
 
 function createRandomCell(array) {
     let random = randomNum();
     let randomCell = array[random];
-    while(randomCell.classList.contains('selected')){
-        const newRandom = randomNum();
-        randomCell = array[newRandom];
+    while(randomCell.textContent !== ''){
+        random = randomNum();
+        randomCell = array[random];
     }
     return randomCell;
 }
@@ -217,6 +217,7 @@ function setEasy() {
     for(let i=0;i<cells.length;i++) {
         const currentCell = cells[i];
         function gameEvents() {
+            if(winner.textContent === ''){
             switchingPlayer(currentCell);
             checkWin(cells); 
             if(checkDraw(cells)) setDraw();
@@ -225,6 +226,7 @@ function setEasy() {
             switchingPlayer(randomCell);
             checkWin(cells);
             if(checkDraw(cells)) setDraw();
+                }
             }
         }
         currentCell.addEventListener('click',gameEvents);
